@@ -11,7 +11,7 @@ fi
 # Number of running threads
 export OMP_NUM_THREADS=$1
 
-#Basename of satellite imagery tile
+#Basename of satellite imagery tile with Path and Row
 productL8=LC08_L1TP_142054_
 
 #RSDATA directory (sub) structure
@@ -27,22 +27,34 @@ rm $out_l8/*.tif -f
 
 #Process by timestamp range
 for (( doy = 2018000 ; doy <= 2019000 ; doy++ ))
-do test0=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
+do test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 
+		tar xvf $test0
 		do 
 			test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
 			test2=$(find $in_l8_qa -type f | grep $productL8$doy | wc -l)
   			test3=$(find $out_l8 -type f | grep $out_l8$productL8$doy\_L8.tif | wc -l)
-  			if [ $test1 -eq 1 -a $test2 -eq 1 -a $test3 -eq 0 ]
+ 			#if output exists, do not overwrite
+			if [ $test1 -eq 1 -a $test2 -eq 1 -a $test3 -eq 0 ]
   			then 
-				inB2=$in_l8$productLAI$doy\_L8.tif 
-				inB3=$in_l8_qa$productLAI$doy\_L8_QA.tif 
-				outLAI=$out_l8$productLAI$doy\_L8.tif 
+				inB2=$in_l8$productL8$doy\_L8.tif 
+				inB3=$in_l8_qa$productL8$doy\_L8_QA.tif 
+				outL8=$out_l8$productL8$doy.tif 
+				# Process
 				echo "./l8T1Qa $inB2 $inB3 $outL8" 
 				./l8T1Qa $inB2 $inB3 $outL8 
+				# Clean up
+				rm -f $in_l8/*.tif
+				rm -f $in_l8/*.txt
+				# Tarball the output file
+				cd $out_l8
+				for file in *.tif
+				do
+					tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
+					rm -f $file
+				done
 			fi 
 		done
 	fi
-
 done
