@@ -9,6 +9,7 @@ echo "$3 is the local output reception directory"
 
 
 echo "Run GCP instance"
+#INIT GCP INSTANCE
 gcloud beta compute --project=able-bazaar-205117 instances create instance-2 --zone=northamerica-northeast1-a --machine-type=n1-standard-$1 --subnet=default --network-tier=PREMIUM --metadata=startup-script=sudo\ apt-get\ update$'\n'sudo\ apt-get\ install\ subversion\ libgdal-dev\ -y$'\n'svn\ co\ https://github.com/YannChemin/L8T1Qa$'\n'cd\ L8T1Qa/trunk/prog_L8T1Qa/ --maintenance-policy=MIGRATE --service-account=904205699198-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=ubuntu-1804-bionic-v20180522 --image-project=ubuntu-os-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-2
 
 echo "Copy Data from local source (enable/disable if needed)"
