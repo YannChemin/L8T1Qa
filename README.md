@@ -12,7 +12,9 @@ echo "$1 is number of threads, on my configuration of GCP max is 8"
 echo "$2 is the local source directory to upload"
 echo "$3 is the local output reception directory"
 
-example:
+example: bash ./runGCP.sh 8 ~/mysrcDataDirwithL8*.tar.gzInside/ ~/localoutputDir/
+
+
 
 
 
