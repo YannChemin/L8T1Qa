@@ -66,6 +66,10 @@ int main( int argc, char *argv[] )
 	GDALRasterIO(hB2,GF_Read,0,0,nX,nY,l2,nX,nY,GDT_Float32,0,0);
 	//L8_QA 
 	GDALRasterIO(hB3,GF_Read,0,0,nX,nY,l3,nX,nY,GDT_Float32,0,0);
+	//Get the number of threads available
+	int n = omp_get_num_threads();
+	//Do not stall the computer
+	omp_set_num_threads(n-1);
 	#pragma omp parallel for default(none) \
 		private (rc, qa) shared (N, l2, l3, lOut)
 	for(rc=0;rc<N;rc++){
