@@ -54,10 +54,11 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 			echo "./l8t1qa $inB2 $inB3 $outL8" 
 			./l8t1qa $inB2 $inB3 $outL8 
 			# Clean up
-			rm -f $in_l8/*.tif
-			rm -f $in_l8/*.txt
+			#rm -f $in_l8/*.tif
+			#rm -f $in_l8/*.txt
 			# Tarball the output file & clean up
 			cd $out_l8
+			echo "cd $out_l8"
 			for file in *.tif
 			do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
 				rm -f $file
