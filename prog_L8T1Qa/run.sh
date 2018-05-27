@@ -36,9 +36,9 @@ do test0=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
   			test3=$(find $out_l8 -type f | grep $out_l8$productL8$doy\_L8.tif | wc -l)
   			if [ $test1 -eq 1 -a $test2 -eq 1 -a $test3 -eq 0 ]
   			then 
-				inB2=$in_lai$productLAI$doy\_L8.tif 
-				inB3=$in_lai_qa$productLAI$doy\_L8_QA.tif 
-				outLAI=$out_lai$productLAI$doy\_L8.tif 
+				inB2=$in_l8$productLAI$doy\_L8.tif 
+				inB3=$in_l8_qa$productLAI$doy\_L8_QA.tif 
+				outLAI=$out_l8$productLAI$doy\_L8.tif 
 				echo "./l8T1Qa $inB2 $inB3 $outL8" 
 				./l8T1Qa $inB2 $inB3 $outL8 
 			fi 
