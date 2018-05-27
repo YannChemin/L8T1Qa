@@ -6,13 +6,20 @@ Playing around with L8 Qa bits
 run it:
 
 echo "bash ./runGCP.sh $noParallelThreads $localSourceDataDir $localOutputDataDir"
+
 echo "bash ./runGCP.sh $1 $2 $3"
+
 echo ""
+
 echo "$1 is number of threads, on my configuration of GCP max is 8"
+
 echo "$2 is the local source directory to upload"
+
 echo "$3 is the local output reception directory"
 
-example: bash ./runGCP.sh 8 ~/mysrcDataDirwithL8*.tar.gzInside/ ~/localoutputDir/
+example: 
+
+bash ./runGCP.sh 8 ~/mysrcDataDirwithL8*.tar.gzInside/ ~/localoutputDir/
 
 
 
