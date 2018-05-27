@@ -34,7 +34,7 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 
 		# Uncompress tarball
-		tar xvf $(find $in_l8 -type f | grep $productL8$doy | grep tar.gz) -C $out_l8 
+		tar xvf $(find $in_l8 -type f | grep $productL8$doy | grep tar.gz) -C $in_l8 
 		# Get input files
 		test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
 		test2=$(find $in_l8_qa -type f | grep $productL8$doy | wc -l)
@@ -59,7 +59,7 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 			cd $out_l8
 			echo "cd $out_l8"
 			for file in *.tif
-			do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
+			do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file -C $out_l8
 				rm -f $file
 			done
 			# Return to program dir
