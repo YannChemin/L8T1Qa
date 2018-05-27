@@ -14,6 +14,9 @@ export OMP_NUM_THREADS=$1
 #Basename of satellite imagery tile with Path and Row
 productL8=LC08_L1TP_142054_
 
+#PWD program
+PWD=$(pwd)
+
 #RSDATA directory (sub) structure
 DataRoot=~/RSDATA/
 root=$DataRoot/3_Products/
@@ -47,13 +50,15 @@ do test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 				# Clean up
 				rm -f $in_l8/*.tif
 				rm -f $in_l8/*.txt
-				# Tarball the output file
+				# Tarball the output file & clean up
 				cd $out_l8
 				for file in *.tif
 				do
 					tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
 					rm -f $file
 				done
+				# Return to program dir
+				cd $PWD
 			fi 
 		done
 	fi
