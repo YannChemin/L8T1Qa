@@ -19,7 +19,7 @@ PWD=$(pwd)
 
 #RSDATA directory (sub) structure
 DataRoot=~/RSDATA
-root=$DataRoot/3_Products/
+root=$DataRoot/3_Products
 in_l8=$DataRoot/2_PreProcessed/L8/
 in_l8_qa=$DataRoot/2_PreProcessed/L8/
 out_l8=$root/$2/
@@ -34,7 +34,7 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 
 		# Uncompress tarball
-		tar xvf $(find $in_l8 -type f | grep $productL8$doy | grep tar.gz) 
+		tar xvf $(find $in_l8 -type f | grep $productL8$doy | grep tar.gz) -C $out_l8 
 		# Get input files
 		test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
 		test2=$(find $in_l8_qa -type f | grep $productL8$doy | wc -l)
