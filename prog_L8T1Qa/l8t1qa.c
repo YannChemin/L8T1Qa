@@ -2,18 +2,18 @@
 #include "gdal.h"
 #include<omp.h>
 
-/* L8 Qa bits [4-5] Water confidence
+/* L8 Qa bits [14-15] Water confidence
  * 00 -> class 0: Not determined
- * 01 -> class 1: No Water (0-33% probability)
- * 10 -> class 2: Maybe water (34-66% probability)
- * 11 -> class 3: Water (66-100% probability)
+ * 01 -> class 1: No Cloud (0-33% probability)
+ * 10 -> class 2: Maybe Cloud (34-66% probability)
+ * 11 -> class 3: Cloud (66-100% probability)
  */
 
-int L8_random_QA(int pixel) {
-    int qatemp;
-    pixel >>= 4; 	/*bits [4-5] become [0-1]*/
-    qatemp = pixel & 0x03;
-    return qatemp;
+int L8QA(int pixel) {
+    int qa1, qa2;
+    pixel >>= 9; 	/*bits [14-15] become [0-1]*/
+    qa1 = pixel & 0x01;
+    return qa1;
 }
 
 void usage()
@@ -73,9 +73,10 @@ int main( int argc, char *argv[] )
 	#pragma omp parallel for default(none) \
 		private (rc, qa) shared (N, l2, l3, lOut)
 	for(rc=0;rc<N;rc++){
-		qa=L8_random_QA(l3[rc]);
-		if( qa != 0) lOut[rc] = -28768; // Check NULL value in L8 product
-		else lOut[rc] = l2[rc];
+		qa=L8QA(l3[rc]);
+		if(qa == 0) lOut[rc] = 0; 
+		else lOut[rc] = qa;
+		//else lOut[rc] = l2[rc];
 	}
 	#pragma omp barrier
 	GDALRasterIO(hBOut,GF_Write,0,0,nX,nY,lOut,nX,nY,GDT_Float32,0,0);
