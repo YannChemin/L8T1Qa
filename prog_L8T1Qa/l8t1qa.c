@@ -2,18 +2,18 @@
 #include "gdal.h"
 #include<omp.h>
 
-/* L8 Qa bits [14-15] Water confidence
+/* L8 Qa bits [5-6] Cloud confidence
  * 00 -> class 0: Not determined
  * 01 -> class 1: No Cloud (0-33% probability)
  * 10 -> class 2: Maybe Cloud (34-66% probability)
  * 11 -> class 3: Cloud (66-100% probability)
  */
 
-int L8QA(int pixel) {
-    int qa1, qa2;
-    pixel >>= 9; 	/*bits [14-15] become [0-1]*/
-    qa1 = pixel & 0x01;
-    return qa1;
+unsigned int L8QA(unsigned int pixel) {
+    unsigned int qa;
+    pixel >>= 4; 	/*bits [4] become [0]*/
+    qa = (unsigned int) (pixel & 0x01);
+    return qa;
 }
 
 void usage()
@@ -57,15 +57,15 @@ int main( int argc, char *argv[] )
 	int nY = GDALGetRasterBandYSize(hB2);
 	int N=nX*nY;
 
-	float *l2 = (float *) malloc(sizeof(float)*N);
-	float *l3 = (float *) malloc(sizeof(float)*N);
-	float *lOut = (float *) malloc(sizeof(float)*N);
+	unsigned int *l2 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *l3 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *lOut = (unsigned int *) malloc(sizeof(unsigned int)*N);
 	int rc, qa;
 
 	//L8 
-	GDALRasterIO(hB2,GF_Read,0,0,nX,nY,l2,nX,nY,GDT_Float32,0,0);
+	GDALRasterIO(hB2,GF_Read,0,0,nX,nY,l2,nX,nY,GDT_UInt32,0,0);
 	//L8_QA 
-	GDALRasterIO(hB3,GF_Read,0,0,nX,nY,l3,nX,nY,GDT_Float32,0,0);
+	GDALRasterIO(hB3,GF_Read,0,0,nX,nY,l3,nX,nY,GDT_UInt32,0,0);
 	//Get the number of threads available
 	int n = omp_get_num_threads();
 	//Do not stall the computer
@@ -74,12 +74,11 @@ int main( int argc, char *argv[] )
 		private (rc, qa) shared (N, l2, l3, lOut)
 	for(rc=0;rc<N;rc++){
 		qa=L8QA(l3[rc]);
-		if(qa == 0) lOut[rc] = 0; 
-		else lOut[rc] = qa;
-		//else lOut[rc] = l2[rc];
+		if(qa != 0) lOut[rc] = 0; 
+		else lOut[rc] = l2[rc];
 	}
 	#pragma omp barrier
-	GDALRasterIO(hBOut,GF_Write,0,0,nX,nY,lOut,nX,nY,GDT_Float32,0,0);
+	GDALRasterIO(hBOut,GF_Write,0,0,nX,nY,lOut,nX,nY,GDT_UInt32,0,0);
 	if( l2 != NULL ) free( l2 );
 	if( l3 != NULL ) free( l3 );
 	GDALClose(hD2);
