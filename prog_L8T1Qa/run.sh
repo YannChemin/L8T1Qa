@@ -19,10 +19,10 @@ export OMP_NUM_THREADS=$1
 productL8=LC08_L1TP_
 
 #PWD program
-PWD=$(pwd)
+PWD=~/L8T1Qa/trunk/prog_L8T1Qa
 
 #RSDATA directory (sub) structure
-DataRoot=$PWD/../RSDATA
+DataRoot=~/L8T1Qa/trunk/RSDATA
 root=$DataRoot/3_Products
 in_l8=$DataRoot/2_PreProcessed/L8/
 in_l8_qa=$DataRoot/2_PreProcessed/L8/
