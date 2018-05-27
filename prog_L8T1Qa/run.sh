@@ -30,12 +30,11 @@ rm $out_l8/*.tif -f
 
 #Process by timestamp range
 for (( doy = 2018000 ; doy <= 2019000 ; doy++ ))
-do test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
+do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 
 		tar xvf $test0
-		do 
-			test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
+		do 	test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
 			test2=$(find $in_l8_qa -type f | grep $productL8$doy | wc -l)
   			test3=$(find $out_l8 -type f | grep $out_l8$productL8$doy\_L8.tif | wc -l)
  			#if output exists, do not overwrite
@@ -53,8 +52,7 @@ do test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 				# Tarball the output file & clean up
 				cd $out_l8
 				for file in *.tif
-				do
-					tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
+				do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file
 					rm -f $file
 				done
 				# Return to program dir
