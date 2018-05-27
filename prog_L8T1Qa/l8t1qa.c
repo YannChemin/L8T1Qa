@@ -2,13 +2,18 @@
 #include "gdal.h"
 #include<omp.h>
 
-/* mcd15A3 MODLAND_QC bits [0-1]
- * 0 -> class 0: L8 produced, Good quality (main algorithm with or without saturation)
- * 1 -> class 1: L8 produced, Other Quality (back-up algorithm or fill values)
+/* L8 Qa bits [4-5] Water confidence
+ * 00 -> class 0: Not determined
+ * 01 -> class 1: No Water (0-33% probability)
+ * 10 -> class 2: Maybe water (34-66% probability)
+ * 11 -> class 3: Water (66-100% probability)
  */
 
 int L8_random_QA(int pixel) {
-    return (pixel & 0x01);
+    int qatemp;
+    pixel >>= 4; 	/*bits [4-5] become [0-1]*/
+    qatemp = pixel & 0x03;
+    return qatemp;
 }
 
 void usage()
@@ -21,7 +26,7 @@ void usage()
 	printf( "-----------------------------------------\n");
 	printf( "inL8\t\tL8 Band x\n");
 	printf( "inL8_QA\t\tL8_Qa\n");
-	printf( "outL8\tQA corrected L8 output [-]\n");
+	printf( "outL8\tWater QA corrected L8 output [-]\n");
 	return;
 }
 
@@ -31,11 +36,11 @@ int main( int argc, char *argv[] )
 		usage();
 		return 1;
 	}
-	char	*inB2	= argv[1]; //L8
+	char	*inB2	= argv[1]; //L8 band x
 	char	*inB3 	= argv[2]; //L8_QA
 	char	*L8F 	= argv[3];
 	GDALAllRegister();
-	GDALDatasetH hD2 = GDALOpen(inB2,GA_ReadOnly);//L8
+	GDALDatasetH hD2 = GDALOpen(inB2,GA_ReadOnly);//L8 band x
 	GDALDatasetH hD3 = GDALOpen(inB3,GA_ReadOnly);//L8_QA
 	if(hD2==NULL||hD3==NULL){
 		printf("One or more input files ");
@@ -57,9 +62,9 @@ int main( int argc, char *argv[] )
 	float *lOut = (float *) malloc(sizeof(float)*N);
 	int rc, qa;
 
-	//L8 1Km
+	//L8 
 	GDALRasterIO(hB2,GF_Read,0,0,nX,nY,l2,nX,nY,GDT_Float32,0,0);
-	//L8_QA 1Km
+	//L8_QA 
 	GDALRasterIO(hB3,GF_Read,0,0,nX,nY,l3,nX,nY,GDT_Float32,0,0);
 	#pragma omp parallel for default(none) \
 		private (rc, qa) shared (N, l2, l3, lOut)
