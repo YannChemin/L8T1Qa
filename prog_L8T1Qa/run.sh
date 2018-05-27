@@ -31,7 +31,6 @@ rm $out_l8/*.tif -f
 #Process by timestamp range
 for (( doy = 2018000 ; doy <= 2019000 ; doy++ ))
 do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
-	echo $test0
 	if [ $test0 -eq 1 ] 
 	then 
 		# Uncompress tarball
