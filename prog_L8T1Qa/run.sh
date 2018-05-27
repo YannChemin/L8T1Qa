@@ -18,7 +18,7 @@ productL8=LC08_L1TP_142054_
 PWD=$(pwd)
 
 #RSDATA directory (sub) structure
-DataRoot=~/RSDATA/
+DataRoot=~/RSDATA
 root=$DataRoot/3_Products/
 in_l8=$DataRoot/2_PreProcessed/L8/
 in_l8_qa=$DataRoot/2_PreProcessed/L8/
@@ -34,19 +34,25 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 	echo $test0
 	if [ $test0 -eq 1 ] 
 	then 
-		tar xvf $test0
+		# Uncompress tarball
+		tar xvf $(find $in_l8 -type f | grep $productL8$doy | grep tar.gz) 
+		# Get input files
 		test1=$(find $in_l8 -type f | grep $productL8$doy | wc -l)
 		test2=$(find $in_l8_qa -type f | grep $productL8$doy | wc -l)
+		# Get output file
   		test3=$(find $out_l8 -type f | grep $out_l8$productL8$doy\_L8.tif | wc -l)
  		#if output exists, do not overwrite
 		if [ $test1 -eq 1 -a $test2 -eq 1 -a $test3 -eq 0 ]
   		then 
-			inB2=$in_l8$productL8$doy\_L8.tif 
-			inB3=$in_l8_qa$productL8$doy\_L8_QA.tif 
-			outL8=$out_l8$productL8$doy.tif 
+			# Get Band 1
+			inB2=$(find $in_l8 -type f | grep $productL8$doy | grep _B1.TIF)
+			# Get QA band
+			inB3=$(find $in_l8 -type f | grep $productL8$doy | grep _BQA.TIF)
+			# Set output name
+			outL8=$out_l8$productL8$doy.tif
 			# Process
-			echo "./l8T1Qa $inB2 $inB3 $outL8" 
-			./l8T1Qa $inB2 $inB3 $outL8 
+			echo "./l8t1qa $inB2 $inB3 $outL8" 
+			./l8t1qa $inB2 $inB3 $outL8 
 			# Clean up
 			rm -f $in_l8/*.tif
 			rm -f $in_l8/*.txt
