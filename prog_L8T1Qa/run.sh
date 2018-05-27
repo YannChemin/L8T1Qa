@@ -54,8 +54,8 @@ do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc
 			# Set output name
 			outL8=$out_l8$productL8\_$doy.tif
 			# Process
-			echo "$PWD/l8t1qa $inB2 $inB3 $outL8" 
-			$PWD/l8t1qa $inB2 $inB3 $outL8 
+			echo "~/L8T1Qa/trunk/prog_L8T1Qa/l8t1qa $inB2 $inB3 $outL8" 
+			~/L8T1Qa/trunk/prog_L8T1Qa/l8t1qa $inB2 $inB3 $outL8 
 			# Clean up
 			rm -f $in_l8/*.TIF
 			rm -f $in_l8/*.txt
