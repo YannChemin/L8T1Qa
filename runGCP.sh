@@ -32,8 +32,8 @@ gcloud compute ssh --zone=northamerica-northeast1-a instance-2 --command 'svn co
 gcloud compute ssh --zone=northamerica-northeast1-a instance-2 --command 'cd ~/L8T1Qa/trunk/prog_L8T1Qa/ && bash run.sh 4 L8T1Qa_Cloud'
 
 #POST PROCESSING: from gcp to local (create locally ~/RSDATA and copy incoming tarballs)
-mkdir -p ~/RSDATA/
-gcloud compute scp --recurse instance-2:~/L8T1Qa/trunk/RSDATA/3_Products/ ~/RSDATA/
+mkdir -p $3
+gcloud compute scp --recurse instance-2:~/L8T1Qa/trunk/RSDATA/3_Products/ $3
 
 #STOP instance
 gcloud compute instances stop instance-2
