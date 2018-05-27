@@ -22,7 +22,7 @@ productL8=LC08_L1TP_142054_
 PWD=$(pwd)
 
 #RSDATA directory (sub) structure
-DataRoot=~/RSDATA
+DataRoot=$PWD/../RSDATA
 root=$DataRoot/3_Products
 in_l8=$DataRoot/2_PreProcessed/L8/
 in_l8_qa=$DataRoot/2_PreProcessed/L8/
@@ -64,7 +64,7 @@ do 	test0=$(find $in_l8 -type f | grep $productL8$doy | grep tar.gz | wc -l)
 			echo "cd $out_l8"
 			for file in *.tif
 			do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file $(echo $file | sed 's/.tif/.IMD/') -C $out_l8
-				#rm -f $file
+				rm -f $file
 				rm -f $(echo $file | sed 's/.tif/.IMD/')
 			done
 			# Return to program dir
