@@ -19,10 +19,10 @@ export OMP_NUM_THREADS=$1
 productL8=LC08_L1TP_
 
 #PWD program
-PWD=~/L8T1Qa/trunk/prog_L8T1Qa
+PWD=$(pwd)
 
 #RSDATA directory (sub) structure
-DataRoot=~/L8T1Qa/trunk/RSDATA
+DataRoot=$PWD/../RSDATA
 root=$DataRoot/3_Products
 in_l8=$DataRoot/2_PreProcessed/L8/
 in_l8_qa=$DataRoot/2_PreProcessed/L8/
@@ -54,8 +54,8 @@ do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc
 			# Set output name
 			outL8=$out_l8$productL8\_$doy.tif
 			# Process
-			echo "~/L8T1Qa/trunk/prog_L8T1Qa/l8t1qa $inB2 $inB3 $outL8" 
-			~/L8T1Qa/trunk/prog_L8T1Qa/l8t1qa $inB2 $inB3 $outL8 
+			echo "$PWD/l8t1qa $inB2 $inB3 $outL8" 
+			time $PWD/l8t1qa $inB2 $inB3 $outL8 
 			# Clean up
 			rm -f $in_l8/*.TIF
 			rm -f $in_l8/*.txt
@@ -67,8 +67,6 @@ do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc
 				rm -f $file
 				rm -f $(echo $file | sed 's/.tif/.IMD/')
 			done
-			# Return to program dir
-			cd $PWD
 		fi 
 	fi
 done
