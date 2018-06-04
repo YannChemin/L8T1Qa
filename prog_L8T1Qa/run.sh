@@ -16,7 +16,7 @@ make
 export OMP_NUM_THREADS=$1
 
 #Basename of satellite imagery tile without Path and Row
-productL8=LC08_L1TP_
+productL8=LC08_L1TP_142054_
 
 #PWD program
 PWD=$(pwd)
@@ -33,7 +33,7 @@ mkdir -p $out_l8
 rm $out_l8/*.tif -f
 
 #Process by timestamp range
-for (( doy = 2018000 ; doy <= 2019000 ; doy++ ))
+for (( doy = 20180429 ; doy <= 20180429 ; doy++ ))
 do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 

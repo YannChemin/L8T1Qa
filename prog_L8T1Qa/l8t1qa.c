@@ -124,10 +124,10 @@ int main( int argc, char *argv[] )
 		qaci=L8QA_cirrus_confidence(l3[rc]);
 		/*No Data in this pixel: [UInt16 val == 1] => -32768*/
 		if(l3[rc]==1){ 
-			lOut[rc]=-32768;
+			lOut[rc] = 32768;
 		/*If clouds, or cloud[shadow][cirrus] confidence QA==[00,01]->[0,1] then mask the pixel*/
-		}else if(qac == 1 || qacc < 2 || qacs < 2 || qaci < 2){
-			lOut[rc] = -32767; 
+		}else if(qac == 1 || qacc > 2 || qacs > 2 || qaci > 2){
+			lOut[rc] = 32767; 
 		/*Finally, all sufficiently less cloud confident or not cloud for sure, use the band pixel value*/
 		}else{
 			lOut[rc] = l2[rc];
