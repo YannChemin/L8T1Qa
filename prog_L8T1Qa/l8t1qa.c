@@ -61,12 +61,15 @@ void usage()
 	printf( "-----------------------------------------\n");
 	printf( "--L8 Processing chain--OpenMP code----\n");
 	printf( "-----------------------------------------\n");
-	printf( "./L8 inL8 inL8_QA\n");
+	printf( "./L8 inL8b4 inL8b5 inL8b6 inL8_QA\n");
 	printf( "\toutL8\n");
 	printf( "-----------------------------------------\n");
-	printf( "inL8\t\tL8 Band x (one band per .tif file)\n");
-	printf( "inL8_QA\t\tL8_Qa\n");
-	printf( "outL8\tCloud removed L8 band output [-]\n");
+	printf( "inL8b4\t\tL8 Band 4 UInt16\n");
+	printf( "inL8b5\t\tL8 Band 5 UInt16\n");
+	printf( "inL8b6\t\tL8 Band 6 UInt16\n");
+	printf( "inL8_QA\t\tL8_Qa UInt16\n");
+	printf( "outL8vi\tCloud removed L8 NDVI output [0-10000]\n");
+	printf( "outL8wi\tCloud removed L8 NDWI output [0-10000]\n");
 	return;
 }
 
@@ -76,43 +79,71 @@ int main( int argc, char *argv[] )
 		usage();
 		return 1;
 	}
-	char	*inB2	= argv[1]; //L8 band x
-	char	*inB3 	= argv[2]; //L8_QA
-	char	*L8F 	= argv[3];
+	char	*inB4	= argv[1]; //L8 band 4
+	char	*inB5	= argv[2]; //L8 band 5
+	char	*inB6	= argv[3]; //L8 band 6
+	char	*inB7 	= argv[4]; //L8_QA
+	char	*L8viF 	= argv[5]; //OUT NDVI
+	char	*L8wiF 	= argv[6]; //OUT NDWI
 	GDALAllRegister();
-	GDALDatasetH hD2 = GDALOpen(inB2,GA_ReadOnly);//L8 band x
-	GDALDatasetH hD3 = GDALOpen(inB3,GA_ReadOnly);//L8_QA
-	if(hD2==NULL||hD3==NULL){
+	GDALDatasetH hD4 = GDALOpen(inB4,GA_ReadOnly);//L8 band 4
+	GDALDatasetH hD5 = GDALOpen(inB5,GA_ReadOnly);//L8 band 5
+	GDALDatasetH hD6 = GDALOpen(inB6,GA_ReadOnly);//L8 band 6
+	GDALDatasetH hD7 = GDALOpen(inB7,GA_ReadOnly);//L8_QA
+	if(hD4==NULL||hD5==NULL||hD6==NULL||hD7==NULL){
 		printf("One or more input files ");
 		printf("could not be loaded\n");
 		exit(1);
 	}
-	GDALDriverH hDr2 = GDALGetDatasetDriver(hD2);
-	GDALDatasetH hDOut = GDALCreateCopy(hDr2,L8F,hD2,FALSE,NULL,NULL,NULL);
-	GDALRasterBandH hBOut = GDALGetRasterBand(hDOut,1);
-	GDALRasterBandH hB2 = GDALGetRasterBand(hD2,1);//L8
-	GDALRasterBandH hB3 = GDALGetRasterBand(hD3,1);//L8_QA
+	GDALDriverH hDr4 = GDALGetDatasetDriver(hD4);
+	GDALDatasetH hDOutVI = GDALCreateCopy(hDr4,L8viF,hD4,FALSE,NULL,NULL,NULL);
+	GDALDatasetH hDOutWI = GDALCreateCopy(hDr4,L8wiF,hD4,FALSE,NULL,NULL,NULL);
+	GDALRasterBandH hBOutVI = GDALGetRasterBand(hDOutVI,1);
+	GDALRasterBandH hBOutWI = GDALGetRasterBand(hDOutWI,1);
+	GDALRasterBandH hB4 = GDALGetRasterBand(hD4,1);//L8 band 4
+	GDALRasterBandH hB5 = GDALGetRasterBand(hD5,1);//L8 band 5
+	GDALRasterBandH hB6 = GDALGetRasterBand(hD6,1);//L8 band 6
+	GDALRasterBandH hB7 = GDALGetRasterBand(hD7,1);//L8_QA
 
-	int nX = GDALGetRasterBandXSize(hB2);
-	int nY = GDALGetRasterBandYSize(hB2);
+	int nX = GDALGetRasterBandXSize(hB4);
+	int nY = GDALGetRasterBandYSize(hB4);
 	int N=nX*nY;
 
-	unsigned int *l2 = (unsigned int *) malloc(sizeof(unsigned int)*N);
-	unsigned int *l3 = (unsigned int *) malloc(sizeof(unsigned int)*N);
-	unsigned int *lOut = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *l4 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *l5 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *l6 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *l7 = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *lOutVI = (unsigned int *) malloc(sizeof(unsigned int)*N);
+	unsigned int *lOutWI = (unsigned int *) malloc(sizeof(unsigned int)*N);
 	int rc, qac, qacc, qacs, qaci;
+	float vi=0.0, wi=0.0;
 
-	//L8 
-	GDALRasterIO(hB2,GF_Read,0,0,nX,nY,l2,nX,nY,GDT_UInt32,0,0);
+	//L8 band 4/5/6 
+	GDALRasterIO(hB4,GF_Read,0,0,nX,nY,l4,nX,nY,GDT_UInt32,0,0);
+	GDALRasterIO(hB5,GF_Read,0,0,nX,nY,l5,nX,nY,GDT_UInt32,0,0);
+	GDALRasterIO(hB6,GF_Read,0,0,nX,nY,l6,nX,nY,GDT_UInt32,0,0);
 	//L8_QA 
-	GDALRasterIO(hB3,GF_Read,0,0,nX,nY,l3,nX,nY,GDT_UInt32,0,0);
+	GDALRasterIO(hB7,GF_Read,0,0,nX,nY,l7,nX,nY,GDT_UInt32,0,0);
 	//Get the number of threads available
 	int n = omp_get_num_threads();
 	//Do not stall the computer
 	omp_set_num_threads(n-1);
 	#pragma omp parallel for default(none) \
-		private (rc, qac, qacc, qacs, qaci) shared (N, l2, l3, lOut)
+		private (rc, vi, wi, qac, qacc, qacs, qaci) \
+		shared (N, l4, l5, l6, l7, lOutVI, lOutWI)
 	for(rc=0;rc<N;rc++){
+		/*process VI*/
+		if(l5[rc]+l4[rc]!=0){
+			vi=(1.0+(l5[rc]-l4[rc])/(l5[rc]+l4[rc]))*10000;
+		}else{
+			vi=32768;
+		}
+		/*process WI*/
+		if(l6[rc]+l5[rc]!=0){
+			vi=(1.0+(l6[rc]-l5[rc])/(l6[rc]+l5[rc]))*10000;
+		}else{
+			vi=32768;
+		}
 		/*process QAs*/
 		/*QA cloud: bit 4*/
 		qac=L8QA_cloud(l3[rc]);
@@ -124,22 +155,31 @@ int main( int argc, char *argv[] )
 		qaci=L8QA_cirrus_confidence(l3[rc]);
 		/*No Data in this pixel: [UInt16 val == 1] => -32768*/
 		if(l3[rc]==1){ 
-			lOut[rc] = 32768;
+			lOutVI[rc] = 32768;
+			lOutWI[rc] = 32768;
 		/*If clouds, or cloud[shadow][cirrus] confidence QA==[00,01]->[0,1] then mask the pixel*/
 		}else if(qac == 1 || qacc > 2 || qacs > 2 || qaci > 2){
-			lOut[rc] = 32767; 
+			lOutVI[rc] = 32767; 
+			lOutWI[rc] = 32767; 
 		/*Finally, all sufficiently less cloud confident or not cloud for sure, use the band pixel value*/
 		}else{
-			lOut[rc] = l2[rc];
+			lOutVI[rc] = vi;
+			lOutWI[rc] = wi;
 		}
 	}
 	#pragma omp barrier
-	GDALRasterIO(hBOut,GF_Write,0,0,nX,nY,lOut,nX,nY,GDT_UInt32,0,0);
-	if( l2 != NULL ) free( l2 );
-	if( l3 != NULL ) free( l3 );
-	GDALClose(hD2);
-	GDALClose(hD3);
-	GDALClose(hDOut);
+	GDALRasterIO(hBOutVI,GF_Write,0,0,nX,nY,lOutVI,nX,nY,GDT_UInt32,0,0);
+	GDALRasterIO(hBOutWI,GF_Write,0,0,nX,nY,lOutWI,nX,nY,GDT_UInt32,0,0);
+	if( l4 != NULL ) free( l4 );
+	if( l5 != NULL ) free( l5 );
+	if( l6 != NULL ) free( l6 );
+	if( l7 != NULL ) free( l7 );
+	GDALClose(hD4);
+	GDALClose(hD5);
+	GDALClose(hD6);
+	GDALClose(hD7);
+	GDALClose(hDOutVI);
+	GDALClose(hDOutWI);
 	return(EXIT_SUCCESS);
 }
 
