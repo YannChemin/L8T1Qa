@@ -71,5 +71,8 @@ gdalwarp -q -multi -t_srs "EPSG:4326" $tmpL8WI $outL8WI
 # Tarball the output file & clean up
 tar -I pigz -cvf $(echo $outL8VI | sed 's/.tif//').tar.gz $outL8VI &>/dev/null
 tar -I pigz -cvf $(echo $outL8WI | sed 's/.tif//').tar.gz $outL8WI &>/dev/null
-rm -f temp*
+rm -f $tmpL8VI &
+rm -f $tmpL8WI &
+rm -f $outL8VI &
+rm -f $outL8WI &
 rm -f *.IMD
