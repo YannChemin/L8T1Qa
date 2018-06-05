@@ -62,7 +62,7 @@ void usage()
 	printf( "--L8 Processing chain--OpenMP code----\n");
 	printf( "-----------------------------------------\n");
 	printf( "./L8 inL8b4 inL8b5 inL8b6 inL8_QA\n");
-	printf( "\toutL8\n");
+	printf( "\toutL8vi outL8wi\n");
 	printf( "-----------------------------------------\n");
 	printf( "inL8b4\t\tL8 Band 4 UInt16\n");
 	printf( "inL8b5\t\tL8 Band 5 UInt16\n");

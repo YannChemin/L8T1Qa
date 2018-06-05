@@ -42,22 +42,30 @@ inBQ=$(ls *pixel_qa.tif)
 outL8VI=$out_l8$(echo $1 | sed 's/.tar.gz//')\_NDVI.tif
 outL8WI=$out_l8$(echo $1 | sed 's/.tar.gz//')\_NDWI.tif
 	
+# Set temp names
+tmpL8VI=$out_l8\_NDVI.tif
+tmpL8WI=$out_l8\_NDWI.tif
+	
 # Process
-echo "$PWD/l8t1qa $inB4 $inB5 $inB6 $inBQ $outL8VI $outL8WI" 
-$PWD/l8t1qa $inB4 $inB5 $inB6 $inBQ $outL8VI $outL8WI
-#echo "python ./run.py $inB4 $inB5 $inB6 $inBQ $outL8VI $outL8WI" 
-#python ./run.py $inB4 $inB5 $inB6 $inBQ $outL8VI $outL8WI 
+echo "$PWD/l8t1qa $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI" 
+$PWD/l8t1qa $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI
+#echo "python ./run.py $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI" 
+#python ./run.py $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI 
 
 # Clean up
 cd $in_l8
 rm -Rf $in_l8/$(echo $1 | sed 's/.tar.gz//')
 
-# Tarball the output file & clean up
+# Go to output Dir
 cd $out_l8
 echo "cd $out_l8"
-for file in *.tif
-do	
-	tar -I pigz -cvzf $(echo $file| sed 's/.tif//').tar.gz $file $(echo $file | sed 's/.tif/.IMD/') -C $out_l8
-	rm -f $file
-	rm -f $(echo $file | sed 's/.tif/.IMD/')
-done
+
+# Convert tmp to EPSG:4326
+gdalwarp -multi -t_srs "EPSG:4326" $tmpL8VI $outL8VI
+gdalwarp -multi -t_srs "EPSG:4326" $tmpL8WI $outL8WI
+
+# Tarball the output file & clean up
+tar -I pigz -cvzf $outL8VI.tar.gz $outL8VI 
+tar -I pigz -cvzf $outL8WI.tar.gz $outL8WI 
+rm -f $outL8VI $outL8WI
+rm -f *.IMD
