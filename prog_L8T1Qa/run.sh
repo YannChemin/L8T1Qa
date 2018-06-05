@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 5 ]; then
   echo 1>&2 "$0: not enough arguments: number of threads & output directory"
   exit 2
-elif [ $# -gt 2 ]; then
+elif [ $# -gt 5 ]; then
   echo 1>&2 "$0: too many arguments"
   exit 2
 fi
@@ -40,24 +40,29 @@ do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc
 		# Uncompress tarball
 		tar xvf $(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz) -C $in_l8 
 		# Get input files count
-		test1=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B1.TIF | wc -l)
-		test2=$(find $in_l8_qa -type f | grep $productL8 | grep $doy | grep _BQA.TIF | wc -l)
+		testb4=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B4.TIF | wc -l)
+		testb5=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B5.TIF | wc -l)
+		testb6=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B6.TIF | wc -l)
+		testqa=$(find $in_l8_qa -type f | grep $productL8 | grep $doy | grep _BQA.TIF | wc -l)
 		# Get output file count
-  		test3=$(find $out_l8 -type f | grep $out_l8$productL8\_$doy.tif | wc -l)
+  		test3=$(find $out_l8 -type f | grep $out_l8$productL8\_$doy\_NDVI.tif | wc -l)
 		#if output exists, do not overwrite (test3 -eq 0)
-		if [ $test1 -eq 1 -a $test2 -eq 1 -a $test3 -eq 0 ]
+		if [ $testb4 -eq 1 -a $testb5 -eq 1 -a $testb6 -eq 1 -a $testqa -eq 1 -a $test3 -eq 0 ]
   		then 
-			# Get Band 1
-			inB2=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B1.TIF)
+			# Get Band 4/5/6
+			inB4=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B4.TIF)
+			inB5=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B5.TIF)
+			inB6=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B6.TIF)
 			# Get QA band
 			inB3=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _BQA.TIF)
 			# Set output name
-			outL8=$out_l8$productL8\_$doy.tif
+			outL8VI=$out_l8$productL8\_$doy\_NDVI.tif
+			outL8WI=$out_l8$productL8\_$doy\_NDWI.tif
 			# Process
-			#echo "$PWD/l8t1qa $inB2 $inB3 $outL8" 
-			#time $PWD/l8t1qa $inB2 $inB3 $outL8
-			echo "python ./run.py $inB2 $inB3 $outL8" 
-			python ./run.py $inB2 $inB3 $outL8 
+			#echo "$PWD/l8t1qa $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI" 
+			#time $PWD/l8t1qa $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI
+			echo "python ./run.py $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI" 
+			python ./run.py $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI 
 			# Clean up
 			rm -f $in_l8/*.TIF
 			rm -f $in_l8/*.txt
