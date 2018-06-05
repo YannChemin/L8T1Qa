@@ -116,7 +116,6 @@ int main( int argc, char *argv[] )
 	unsigned int *lOutVI = (unsigned int *) malloc(sizeof(unsigned int)*N);
 	unsigned int *lOutWI = (unsigned int *) malloc(sizeof(unsigned int)*N);
 	int rc, qac, qacc, qacs, qaci;
-	float vi=0.0, wi=0.0;
 
 	//L8 band 4/5/6 
 	GDALRasterIO(hB4,GF_Read,0,0,nX,nY,l4,nX,nY,GDT_UInt32,0,0);
@@ -129,21 +128,9 @@ int main( int argc, char *argv[] )
 	//Do not stall the computer
 	omp_set_num_threads(n-1);
 	#pragma omp parallel for default(none) \
-		private (rc, vi, wi, qac, qacc, qacs, qaci) \
+		private (rc, qac, qacc, qacs, qaci) \
 		shared (N, l4, l5, l6, l7, lOutVI, lOutWI)
 	for(rc=0;rc<N;rc++){
-		/*process VI*/
-		if(l5[rc]+l4[rc]!=0){
-			vi=(1.0+(l5[rc]-l4[rc])/(l5[rc]+l4[rc]))*10000;
-		}else{
-			vi=32768;
-		}
-		/*process WI*/
-		if(l6[rc]+l5[rc]!=0){
-			wi=(1.0+(l6[rc]-l5[rc])/(l6[rc]+l5[rc]))*10000;
-		}else{
-			wi=32768;
-		}
 		/*process QAs*/
 		/*QA cloud: bit 4*/
 		qac=L8QA_cloud(l7[rc]);
@@ -163,8 +150,18 @@ int main( int argc, char *argv[] )
 			lOutWI[rc] = 32767; 
 		/*Finally, all sufficiently less cloud confident or not cloud for sure, use the band pixel value*/
 		}else{
-			lOutVI[rc] = vi;
-			lOutWI[rc] = wi;
+			/*process VI*/
+			if((l5[rc]+l4[rc])==0){
+				lOutVI[rc]=32768;
+			}else{
+				lOutVI[rc]=(int)(10000.0*l5[rc]-l4[rc])/(1.0*l5[rc]+l4[rc]);
+			}
+			/*process WI*/
+			if((l6[rc]+l5[rc])==0){
+				lOutWI[rc]=32768;
+			}else{
+				lOutWI[rc]=(int)(10000.0*l6[rc]-l5[rc])/(1.0*l6[rc]+l5[rc]);
+			}
 		}
 	}
 	#pragma omp barrier
