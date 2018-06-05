@@ -140,21 +140,21 @@ int main( int argc, char *argv[] )
 		}
 		/*process WI*/
 		if(l6[rc]+l5[rc]!=0){
-			vi=(1.0+(l6[rc]-l5[rc])/(l6[rc]+l5[rc]))*10000;
+			wi=(1.0+(l6[rc]-l5[rc])/(l6[rc]+l5[rc]))*10000;
 		}else{
-			vi=32768;
+			wi=32768;
 		}
 		/*process QAs*/
 		/*QA cloud: bit 4*/
-		qac=L8QA_cloud(l3[rc]);
+		qac=L8QA_cloud(l7[rc]);
 		/*QA cloud confidence: bits 5-6*/
-		qacc=L8QA_cloud_confidence(l3[rc]);
+		qacc=L8QA_cloud_confidence(l7[rc]);
 		/*QA cloud shadow: bits 7-8*/
-		qacs=L8QA_cloud_shadow(l3[rc]);
+		qacs=L8QA_cloud_shadow(l7[rc]);
 		/*QA cirrus confidence: bits 11-12*/
-		qaci=L8QA_cirrus_confidence(l3[rc]);
+		qaci=L8QA_cirrus_confidence(l7[rc]);
 		/*No Data in this pixel: [UInt16 val == 1] => -32768*/
-		if(l3[rc]==1){ 
+		if(l7[rc]==1){ 
 			lOutVI[rc] = 32768;
 			lOutWI[rc] = 32768;
 		/*If clouds, or cloud[shadow][cirrus] confidence QA==[00,01]->[0,1] then mask the pixel*/
