@@ -61,8 +61,8 @@ void usage()
 	printf( "-----------------------------------------\n");
 	printf( "--L8 Processing chain--OpenMP code----\n");
 	printf( "-----------------------------------------\n");
-	printf( "./L8 inL8b4 inL8b5 inL8b6 inL8_QA\n");
-	printf( "\toutL8vi outL8wi\n");
+	printf( "./L8 inL8b4 inL8b5 inL8b6 inL8B7 inL8_QA\n");
+	printf( "\toutL8vi outL8wi outL8LSWI outL8NBR2\n");
 	printf( "-----------------------------------------\n");
 	printf( "inL8b4\t\tL8 Band 4 UInt16 (Red)\n");
 	printf( "inL8b5\t\tL8 Band 5 UInt16 (NIR)\n");
@@ -78,7 +78,7 @@ void usage()
 
 int main( int argc, char *argv[] )
 {
-	if( argc < 4 ) {
+	if( argc < 9 ) {
 		usage();
 		return 1;
 	}
@@ -190,9 +190,9 @@ int main( int argc, char *argv[] )
 			}
 			/*process NBR2*/
 			if((l6[rc]+l7[rc])==0){
-				lOutLSWI[rc]=32768;
+				lOutNBR2[rc]=32768;
 			}else{
-				lOutLSWI[rc]=(int)(10000.0*l6[rc]-l7[rc])/(1.0*l6[rc]+l7[rc]);
+				lOutNBR2[rc]=(int)(10000.0*l6[rc]-l7[rc])/(1.0*l6[rc]+l7[rc]);
 			}
 		}
 	}
