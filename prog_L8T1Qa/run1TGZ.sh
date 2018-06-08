@@ -11,10 +11,10 @@ elif [ $# -gt 1 ]; then
 fi
 
 #INPUT L8 DIR
-in_l8=~/RSDATA/IN_L8/IN_L8_Ya
+in_l8=~/RSDATA/IN_L8/
 
 #Make output directory
-out_l8=~/RSDATA/OUT_L8_Ya
+out_l8=~/RSDATA/OUT_L8
 mkdir -p $out_l8
 rm $out_l8/*.tif -f
 
@@ -40,21 +40,26 @@ cd $in_l8/$(echo $tgzF | sed 's/.tar.gz//')
 inB4=$(ls *band4.tif)
 inB5=$(ls *band5.tif)
 inB6=$(ls *band6.tif)
+inB7=$(ls *band7.tif)
 inBQ=$(ls *pixel_qa.tif)
 
 # Set output names
 outL8VI=$out_l8/$(echo $tgzF | sed 's/.tar.gz//')\_NDVI.tif
 outL8WI=$out_l8/$(echo $tgzF | sed 's/.tar.gz//')\_NDWI.tif
+outL8LSWI=$out_l8/$(echo $tgzF | sed 's/.tar.gz//')\_LSWI.tif
+outL8NBR2=$out_l8/$(echo $tgzF | sed 's/.tar.gz//')\_NBR2.tif
 	
 # Set temp names
 tmpL8VI=$out_l8/temp_$(echo $tgzF | sed 's/.tar.gz//')\_NDVI.tif
 tmpL8WI=$out_l8/temp_$(echo $tgzF | sed 's/.tar.gz//')\_NDWI.tif
+tmpL8LSWI=$out_l8/temp_$(echo $tgzF | sed 's/.tar.gz//')\_LSWI.tif
+tmpL8NBR2=$out_l8/temp_$(echo $tgzF | sed 's/.tar.gz//')\_NBR2.tif
 	
 # Process
-#echo "$prog/l8t1qa $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI" 
-$prog/l8t1qa $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI
-#echo "python ./run.py $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI" 
-#python ./run.py $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI 
+#echo "$prog/l8t1qa $inB4 $inB5 $inB6 $inB7 $inBQ $tmpL8VI $tmpL8WI $tmpL8LSWI $tmpL8NBR2" 
+$prog/l8t1qa $inB4 $inB5 $inB6 $inB7 $inBQ $tmpL8VI $tmpL8WI $tmpL8LSWI $tmpL8NBR2
+#echo "python ./run.py $inB4 $inB5 $inB6 $inB7 $inBQ $tmpL8VI $tmpL8WI $tmpL8LSWI $tmpL8NBR2" 
+#python ./run.py $inB4 $inB5 $inB6 $inBQ $tmpL8VI $tmpL8WI $tmpL8LSWI $tmpL8NBR2
 
 # Clean up
 cd $in_l8
@@ -64,15 +69,23 @@ rm -Rf $in_l8/$(echo $1 | sed 's/.tar.gz//')
 cd $out_l8
 #echo "cd $out_l8"
 
-# Convert tmp to EPSG:4326
+# Convert tmp to EPSG:4326 & clean up
 gdalwarp -q -multi -t_srs "EPSG:4326" $tmpL8VI $outL8VI
 gdalwarp -q -multi -t_srs "EPSG:4326" $tmpL8WI $outL8WI
-
-# Tarball the output file & clean up
-tar -I pigz -cvf $(echo $outL8VI | sed 's/.tif//').tar.gz $outL8VI &>/dev/null
-tar -I pigz -cvf $(echo $outL8WI | sed 's/.tif//').tar.gz $outL8WI &>/dev/null
+gdalwarp -q -multi -t_srs "EPSG:4326" $tmpL8LSWI $outL8LSWI
+gdalwarp -q -multi -t_srs "EPSG:4326" $tmpL8NBR2 $outL8NBR2
 rm -f $tmpL8VI &
 rm -f $tmpL8WI &
+rm -f $tmpL8LSWI &
+rm -f $tmpL8NBR2 &
+
+# Tarball the output file & clean up
+tar -I pigz -cvf $(echo $outL8VI | sed 's/.tif//').tar.gz --directory=$out_l8 $(echo $tgzF | sed 's/.tar.gz//')\_NDVI.tif &>/dev/null
+tar -I pigz -cvf $(echo $outL8WI | sed 's/.tif//').tar.gz --directory=$out_l8 $(echo $tgzF | sed 's/.tar.gz//')\_NDWI.tif &>/dev/null
+tar -I pigz -cvf $(echo $outL8LSWI | sed 's/.tif//').tar.gz --directory=$out_l8 $(echo $tgzF | sed 's/.tar.gz//')\_LSWI.tif &>/dev/null
+tar -I pigz -cvf $(echo $outL8NBR2 | sed 's/.tif//').tar.gz --directory=$out_l8 $(echo $tgzF | sed 's/.tar.gz//')\_NBR2.tif &>/dev/null
 rm -f $outL8VI &
 rm -f $outL8WI &
+rm -f $outL8LSWI &
+rm -f $outL8NBR2 &
 rm -f *.IMD
