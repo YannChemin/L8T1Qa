@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #INPUT L8 DIR
-in_l8=~/RSDATA/IN_L8/
+in_l8=~/RSDATA/IN_L8/WestBengal
 
 #Make output directory
-out_l8=~/RSDATA/OUT_L8
+out_l8=~/RSDATA/OUT_L8/WestBengal
 mkdir -p $out_l8
 rm $out_l8/*.tif -f
 

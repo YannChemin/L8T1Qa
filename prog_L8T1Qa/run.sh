@@ -24,8 +24,8 @@ PWD=$(pwd)
 #RSDATA directory (sub) structure
 DataRoot=$PWD/../RSDATA
 root=$DataRoot/3_Products
-in_l8=$DataRoot/2_PreProcessed/L8/
-in_l8_qa=$DataRoot/2_PreProcessed/L8/
+in_l8=$DataRoot/2_PreProcessed/L8/WestBengal/
+in_l8_qa=$DataRoot/2_PreProcessed/L8/WestBengal/
 out_l8=$root/$2/
 
 #Make output directory
@@ -33,7 +33,7 @@ mkdir -p $out_l8
 rm $out_l8/*.tif -f
 
 #Process by timestamp range
-for (( doy = 20180429 ; doy <= 20180429 ; doy++ ))
+for (( doy = 2013000 ; doy <= 2014180 ; doy++ ))
 do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc -l)
 	if [ $test0 -eq 1 ] 
 	then 
@@ -54,23 +54,25 @@ do 	test0=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep tar.gz | wc
 			inB5=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B5.TIF)
 			inB6=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _B6.TIF)
 			# Get QA band
-			inB3=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _BQA.TIF)
+			inQA=$(find $in_l8 -type f | grep $productL8 | grep $doy | grep _BQA.TIF)
 			# Set output name
 			outL8VI=$out_l8$productL8\_$doy\_NDVI.tif
 			outL8WI=$out_l8$productL8\_$doy\_NDWI.tif
 			# Process
-			#echo "$PWD/l8t1qa $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI" 
-			#time $PWD/l8t1qa $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI
-			echo "python ./run.py $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI" 
-			python ./run.py $inB4 $inB5 $inB6 $inB3 $outL8VI $outL8WI 
+			#echo "$PWD/l8t1qa $inB4 $inB5 $inB6 $inQA $outL8VI $outL8WI" 
+			#time $PWD/l8t1qa $inB4 $inB5 $inB6 $inQA $outL8VI $outL8WI
+			echo "python ./run.py $inB4 $inB5 $inB6 $inQA $outL8VI $outL8WI" 
+			python ./run.py $inB4 $inB5 $inB6 $inQA $outL8VI $outL8WI 
 			# Clean up
 			rm -f $in_l8/*.TIF
 			rm -f $in_l8/*.txt
+			rm -f $in_l8/*.xml
 			# Tarball the output file & clean up
 			cd $out_l8
 			echo "cd $out_l8"
 			for file in *.tif
-			do	tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file $(echo $file | sed 's/.tif/.IMD/') -C $out_l8
+			do	
+				tar -cvzf $(echo $file| sed 's/.tif//').tar.gz $file $(echo $file | sed 's/.tif/.IMD/') -C $out_l8
 				rm -f $file
 				rm -f $(echo $file | sed 's/.tif/.IMD/')
 			done
